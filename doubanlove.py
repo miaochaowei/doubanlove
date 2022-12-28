@@ -7,6 +7,8 @@ import datetime
 import os
 import re
 
+
+
 path="data/douban2/"
 # 返回path下所有文件构成的一个list列表
 filelist=os.listdir(path)
