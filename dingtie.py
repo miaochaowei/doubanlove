@@ -7,6 +7,8 @@ import requests
 import os.path as Path
 from bs4 import BeautifulSoup
 
+# https://www.douban.com/group/642236/
+
 
 # with open('data/cookies.json',encoding='utf8') as f1:
 #     #加载文件的对象
