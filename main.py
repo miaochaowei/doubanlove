@@ -12,6 +12,10 @@ def print_hi(name):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print(int("234"))
+    id="234"
+    url = "\"https://www.douban.com/doumail/write?to=" + str(id)+"\""
+    js = 'window.open(%s);'%url
+    print(js)
     cookies = [{'domain': '.douban.com', 'expiry': 1735373184, 'httpOnly': False, 'name': '__utmv', 'path': '/',
                 'secure': False, 'value': '30149280.14000'},
                {'domain': '.douban.com', 'expiry': 1674893183, 'httpOnly': False, 'name': 'push_doumail_num',
