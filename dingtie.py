@@ -8,7 +8,7 @@ import os.path as Path
 from bs4 import BeautifulSoup
 
 # https://www.douban.com/group/642236/
-
+# https://www.douban.com/group/707669
 
 # with open('data/cookies.json',encoding='utf8') as f1:
 #     #加载文件的对象
@@ -22,7 +22,7 @@ from bs4 import BeautifulSoup
     # cookies =";".join([item +"=" + cookies[item] +"" for item in cookies.keys()])
     # print("b"+cookies)
 
-cookie1 = "douban-fav-remind=1; ll=\"108288\"; bid=5Z-fX5U2XPI; __utmc=30149280; __yadk_uid=7TPnyXnAad8IRoiCHFh9ZDw3Xc2GRQ4L; frodotk_db=\"150adc461b464c033f2094d251d2e409\"; __utmz=30149280.1672377135.22.3.utmcsr=baidu|utmccn=(organic)|utmcmd=organic; ct=y; dbcl2=\"257220224:AQAnxxrfZy4\"; ck=rElM; __utmv=30149280.25722; _pk_ref.100001.8cb4=%5B%22%22%2C%22%22%2C1672384495%2C%22https%3A%2F%2Faccounts.douban.com%2F%22%5D; _pk_ses.100001.8cb4=*; push_doumail_num=0; __utma=30149280.1662088207.1634110102.1672379916.1672384495.24; push_noty_num=0; __utmt=1; _pk_id.100001.8cb4=47136e70f8f6a6f7.1634110101.23.1672386515.1672381833.; __utmb=30149280.316.4.1672386515077"
+cookie1 = "ll=\"108288\"; bid=7GpWuc4OQyM; __utma=30149280.409343374.1672714901.1672714901.1672714901.1; __utmc=30149280; __utmz=30149280.1672714901.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); dbcl2=\"140005612:UNql5Lve3mg\"; ck=2i__; push_noty_num=0; push_doumail_num=0; __utmv=30149280.14000; __yadk_uid=wL3fTCa49bhygl9FstWZFPQZuG2c5RpN; douban-fav-remind=1; _pk_id.100001.8cb4=9264eb45c4345e76.1672714900.1.1672715797.1672714900."
 
 # print(cookie)
 # cookie="ll=\"108288\"; bid=dDMMFxNh_y0; _pk_ses.100001.8cb4=*; __utma=30149280.1639651790.1672302648.1672302648.1672302648.1; __utmc=30149280; __utmz=30149280.1672302648.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utmt=1; dbcl2=\"140005612:U1zhcJlWzW0\"; ck=T_pG; ap_v=0,6.0; push_noty_num=0; push_doumail_num=0; __utmv=30149280.14000; __yadk_uid=ItOMXOTiKjjFV7B4kMqJPzQUy5bGSMLu; douban-fav-remind=1; _pk_id.100001.8cb4=48c32bce946dc4e1.1672302648.1.1672302950.1672302648.; __utmb=30149280.12.7.1672302949913"
@@ -49,9 +49,9 @@ import random
 import os
 
 
-index=8
+index=16
 rc=["girlname","girlnum","orgname","orglink","location","popnum","time"]
-lines=[]
+lines=set()
 all_df_path="data/douyou/alread.csv"
 alreadydf= pd.DataFrame(columns=rc)
 if os.path.exists(all_df_path):
@@ -59,7 +59,7 @@ if os.path.exists(all_df_path):
 
 for i in range(0,1000):
 
-    page ="https://www.douban.com/group/707669/discussion?start={}&type=new".format(index*25)
+    page ="https://www.douban.com/group/642236/discussion?start={}&type=new".format(index*25)
 
 
 
@@ -78,33 +78,37 @@ for i in range(0,1000):
         girlsc = soup.contents[1].contents[3].contents[15].contents[1].contents[3].contents[1].contents[3].contents[1].contents
         for girls in girlsc:
             print(index, len(lines))
-            if girls.text != "\n" and girls.contents and len(girls.contents) == 9:
-                gl = girls.contents
-                orglink = gl[1].find("a").get('href').replace("\n", "").strip()
-                orgtitle = gl[1].find("a").text.replace("\n", "").strip()
-                girlname = gl[3].find("a").text.replace("\n", "").strip()
-                girllink = gl[3].find("a").get('href').replace("\n", "").strip()
-                response = requests.get(girllink, timeout=10, headers=headers)
-                html = response.content
-                soup = BeautifulSoup(html, "lxml")
-                popnum = gl[5].contents[0] if len(gl[5].contents) > 0 else 0
-                house_elements = soup.find('div', class_='user-info')
+            try:
+                if girls.text != "\n" and girls.contents and len(girls.contents) == 9:
+                    gl = girls.contents
+                    orglink = gl[1].find("a").get('href').replace("\n", "").strip()
+                    orgtitle = gl[1].find("a").text.replace("\n", "").strip()
+                    girlname = gl[3].find("a").text.replace("\n", "").strip()
+                    girllink = gl[3].find("a").get('href').replace("\n", "").strip()
+                    response = requests.get(girllink, timeout=10, headers=headers)
+                    html = response.content
+                    soup = BeautifulSoup(html, "lxml")
+                    popnum = gl[5].contents[0] if len(gl[5].contents) > 0 else 0
+                    house_elements = soup.find('div', class_='user-info')
 
-                girlnum = house_elements.find('div', class_='pl').text.replace("\n", "").strip().split("      ")[0]
-                girllocation = house_elements.find('span', class_='ip-location').text.replace("\n", "").strip()
+                    girlnum = house_elements.find('div', class_='pl').text.replace("\n", "").strip().split("      ")[0]
+                    girllocation = house_elements.find('span', class_='ip-location').text.replace("\n", "").strip()
 
-                if girllocation.__contains__("北京") and int(girlnum) not in [l[1] for l in lines] and int(girlnum) \
-                        not in alreadydf["girlnum"].unique().tolist() and int(popnum) > 5:
-                    line = []
-                    line.append(girlname)
-                    line.append(girlnum)
-                    line.append(orgtitle)
-                    line.append(orglink)
-                    line.append(girllocation)
+                    if girllocation.__contains__("北京") and int(girlnum) not in [l[1] for l in lines] and int(girlnum) \
+                            not in alreadydf["girlnum"].unique().tolist() and int(popnum) > 5:
+                        line = []
+                        line.append(girlname)
+                        line.append(girlnum)
+                        line.append(orgtitle)
+                        line.append(orglink)
+                        line.append(girllocation)
 
-                    line.append(popnum)
-                    line.append(datetime.datetime.today())
-                    lines.append(line)
+                        line.append(popnum)
+                        line.append(datetime.datetime.today())
+                        lines.add(line)
+
+            except Exception as e:
+                print(e)
 
     except Exception as e:
         print(e)
@@ -112,23 +116,23 @@ for i in range(0,1000):
 
 
     index += 1
-    if len(lines)>2:
+    if len(lines)>10:
       break
 
 print(lines)
 
 
 
-
-chrome_driver="/home/mi/PycharmProjects/doubanlove/ke/chromedriver"
-driver = webdriver.Chrome(executable_path=chrome_driver)
-driver.get('https://www.douban.com/')
-# # 点击 密码登录  按钮 。但是找不到该element，不存在网页中
-# 找到登陆的iframe
-login_iframe = driver.find_element_by_xpath('//div[@class="login"]/iframe')
-# 切换到iframe
-driver.switch_to.frame(login_iframe)
-# 点击密码登陆account-tab-account
+#
+# chrome_driver="/home/mi/PycharmProjects/doubanlove/ke/chromedriver"
+# driver = webdriver.Chrome(executable_path=chrome_driver)
+# driver.get('https://www.douban.com/')
+# # # 点击 密码登录  按钮 。但是找不到该element，不存在网页中
+# # 找到登陆的iframe
+# login_iframe = driver.find_element_by_xpath('//div[@class="login"]/iframe')
+# # 切换到iframe
+# driver.switch_to.frame(login_iframe)
+# # 点击密码登陆account-tab-account
 # driver.find_element_by_class_name('account-tab-account').click()
 # # 填写账号
 # driver.find_element_by_id('username').clear()
@@ -138,15 +142,15 @@ driver.switch_to.frame(login_iframe)
 # driver.find_element_by_id('password').clear()
 # driver.find_element_by_id('password').send_keys('mcw19910212')
 # driver.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div[5]/a').click()
-
-# click account phone              account-tab-phone on
-driver.find_element_by_class_name('account-tab-phone.on').click()
-driver.find_element_by_class_name('account-form-input').clear()
-driver.find_element_by_class_name('account-form-input').send_keys('18518056212')
-
-# get phone test num
-driver.find_element_by_class_name("account-form-field-code ").click()
-time.sleep(40)
+#
+# # click account phone              account-tab-phone on
+# driver.find_element_by_class_name('account-tab-phone.on').click()
+# driver.find_element_by_class_name('account-form-input').clear()
+# driver.find_element_by_class_name('account-form-input').send_keys('18518056212')
+#
+# # get phone test num
+# driver.find_element_by_class_name("account-form-field-code ").click()
+# time.sleep(40)
 
 # driver.find_element_by_class_name("account-form-field-submit ").click()
 
@@ -171,32 +175,32 @@ print("login success")
 #     # indent=2 JSON数据的缩进，美观
 #     json.dump(cookies,f2,ensure_ascii=False,indent=2)
 
-def senddouyou(id):
-
-    comment_firstpra = ["你好，首先如果打扰到您真的很抱歉，我无法看到很多的具体您的信息，我是从相亲小组不小心点过来的，我是真的看到帖子觉得很有眼缘，不打扰的话可以认识一下，我是在某大厂做人工智能算法的，只是工作比较忙，我也不太喜欢相亲这种急功近利的方式，所以看到你的帖子看看是不是可以通过别的渠道 认识喜欢的女孩子。下面是我的具体信息，我真的希望得到你的回复\n"]
-
-    contents=["  基本情况 人工智能炼丹工程师,91年 山西人，月入40k 外地有一套房，还有三四十万得贷款,没有负担，想还随时可以\n"
-    ,"  兴趣爱好 不喝酒 不抽烟，不打游戏，喜欢健身，有胸肌 有腹肌，比较壮。\n"
-    ,"  未来规划 因为行业原因，北京得行业前景最好，但是没有户口，未来的话，我觉得可以两个人共同决定\n"
-    ,"  个人经历 硕士毕业之后，负责风控算法项目，后带领一个4-5 人的团队在公司对公司的贷前贷后做算法服务赋能，之后跳槽到小米现在负责组件商店的搜索推荐算法。总的来讲 职业前景很好，现在小米又接触到很多优质的资源。\n"
-    ,"  我的希望 努力的找到合适的另一半，可以建立健康的稳定的亲密关系，可以有共同的生活人生目标，就算两个人有些地方有分歧可以求同存异，为了这个目标团结一致。\n","附件是我得照片，请你检阅。非常感谢你看了我的介绍阿，我也非常期待你的回信和对我的看法"]
-
-    content=comment_firstpra+contents
-    driver.get("https://www.douban.com/doumail/write?to="+str(id))
-    # url = "\"https://www.douban.com/doumail/write?to=" + str(id) + "\""
-    # js = 'window.open(%s);' % url
-    # driver.execute_script(js)
-    driver.find_element_by_id("m_text").clear()
-    driver.find_element_by_id('m_text').send_keys(content)
-    driver.find_element_by_name("m_submit").click()
-    time.sleep(20)
+# def senddouyou(id):
+#
+#     comment_firstpra = ["你好，首先如果打扰到您真的很抱歉，我无法看到很多的具体您的信息，我是从相亲小组不小心点过来的，我是真的看到帖子觉得很有眼缘，不打扰的话可以认识一下，我是在某大厂做人工智能算法的，只是工作比较忙，我也不太喜欢相亲这种急功近利的方式，所以看到你的帖子看看是不是可以通过别的渠道 认识喜欢的女孩子。下面是我的具体信息，我真的希望得到你的回复\n"]
+#
+#     contents=["  基本情况 人工智能炼丹工程师,91年 山西人，月入40k 外地有一套房，还有三四十万得贷款,没有负担，想还随时可以\n"
+#     ,"  兴趣爱好 不喝酒 不抽烟，不打游戏，喜欢健身，有胸肌 有腹肌，比较壮。\n"
+#     ,"  未来规划 因为行业原因，北京得行业前景最好，但是没有户口，未来的话，我觉得可以两个人共同决定\n"
+#     ,"  个人经历 硕士毕业之后，负责风控算法项目，后带领一个4-5 人的团队在公司对公司的贷前贷后做算法服务赋能，之后跳槽到小米现在负责组件商店的搜索推荐算法。总的来讲 职业前景很好，现在小米又接触到很多优质的资源。\n"
+#     ,"  我的希望 努力的找到合适的另一半，可以建立健康的稳定的亲密关系，可以有共同的生活人生目标，就算两个人有些地方有分歧可以求同存异，为了这个目标团结一致。\n","附件是我得照片，请你检阅。非常感谢你看了我的介绍阿，我也非常期待你的回信和对我的看法"]
+#
+#     content=comment_firstpra+contents
+#     driver.get("https://www.douban.com/doumail/write?to="+str(id))
+#     # url = "\"https://www.douban.com/doumail/write?to=" + str(id) + "\""
+#     # js = 'window.open(%s);' % url
+#     # driver.execute_script(js)
+#     driver.find_element_by_id("m_text").clear()
+#     driver.find_element_by_id('m_text').send_keys(content)
+#     driver.find_element_by_name("m_submit").click()
+#     time.sleep(20)
 
 newlines=[]
 sendlist=[l[1] for l in lines]
 print(sendlist)
 for num in sendlist:
     try :
-        senddouyou(num)
+        # senddouyou(num)
         newlines.append(num)
     except Exception as e:
         print(str(num) +"   fail")
